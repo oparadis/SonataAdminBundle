@@ -39,13 +39,15 @@ class ModelType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['multiple']) {
-            $builder
-                ->addEventSubscriber(new MergeCollectionListener($options['model_manager']))
-                ->addViewTransformer(new ModelsToArrayTransformer($options['choice_list']), true);
+            $builder->addEventSubscriber(new MergeCollectionListener($options['model_manager']));
+
+            if ($options['model_transform']) {
+                $builder->addViewTransformer(new ModelsToArrayTransformer($options['choice_list']), true);
+            }
         } else {
-            $builder
-                ->addViewTransformer(new ModelToIdTransformer($options['model_manager'], $options['class']), true)
-            ;
+            if ($options['model_transform']) {
+                $builder->addViewTransformer(new ModelToIdTransformer($options['model_manager'], $options['class']), true);
+            }
         }
     }
 
@@ -60,6 +62,7 @@ class ModelType extends AbstractType
             },
 
             'template'          => 'choice',
+            'model_transform'   => true,
             'multiple'          => false,
             'expanded'          => false,
             'model_manager'     => null,
